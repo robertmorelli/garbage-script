@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Roskakoripalo Markup Language
+    </title>
+
+    <script src="js/garb-script.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/style.css"/>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes">
+</head>
+
+<body> 
+    <garb-events>
+
+        {cltwice}{cc}[
+        clickThenResize as c;
+        ]
+
+        {clickThenResize}{BA}[
+        click as B;
+        resize as A;
+        ]
+
+        {Grey}{V}[
+        background-color becomes "grey"? as V;
+        ] 
+        
+    </garb-events>
+    <garb-script>
+        {div.selectme}{div.prepost}{div.prepost}[
+        background-color from data-truecolor when mouseout;
+        ]
+
+
+        {div.prepost}[
+        log from background-color when Grey;
+        ]
+
+
+        {div.selectme}{div.prepost}[
+        background-color from background-color when mouseover;
+        data-truecolor from background-color when click;
+        ]
+
+
+        {div.selectme}[
+        height from "200px" when mouseover;
+        height from "100px" when mouseout;
+        ]
+
+
+        {div#swapem}{div.swapme}[
+        swap data-text background-color when click;
+        ]
+
+
+        {div.hoverme}[
+        background-color from "orange"? when mouseover;
+        background-color from "grey"? when mouseout;
+        innerText from data-hover when mouseover;
+        innerText from data-nohover when mouseout;
+        ]
+
+
+        {div#toggleme}[
+        swap innerText data-text when click;
+        background-color from "red"? when clickThenResize;
+        background-color from "blue"? when cltwice;
+        ]
+
+    </garb-script>
+    <div draggable="true" class="prepost" data-truecolor="grey">
+        pre
+    </div>
+    <div>
+        <div class="selectme">
+            hi
+        </div>
+        <div class="selectme">
+            hi
+        </div>
+        <div class="selectme">
+            hi
+        </div>
+        <div class="selectme">
+            hi
+        </div>
+        <div class="selectme">
+            hi
+        </div>
+        <div class="selectme">
+            hi
+        </div>
+        <div class="selectme">
+            hi
+        </div>
+    </div>
+    <div class="prepost" data-truecolor="grey">
+        post
+    </div>
+    <div class="hoverme" data-hover="hoving 1" data-nohover="not hoving 1">
+        hover over me
+    </div>
+    <div class="hoverme" data-hover="hoving 2" data-nohover="not hoving 2">
+        hover over me
+    </div>
+    <div id="toggleme" data-text="off">
+        on
+    </div>
+    <div>
+        <div class="swapme" data-text="red" style="background-color: aqua;">
+            color swap zone
+        </div>
+        <div class="swapme" data-text="blue" style="background-color: red;">
+            color swap zone
+        </div>
+        <div class="swapme" data-text="green" style="background-color: orange;">
+            color swap zone
+        </div>
+        <div class="swapme" data-text="orange" style="background-color: yellow;">
+            color swap zone
+        </div>
+        <div class="swapme" data-text="grey" style="background-color: black;">
+            color swap zone
+        </div>
+        <div class="swapme" data-text="blue" style="background-color: red;">
+            color swap zone
+        </div>
+    </div>
+    <div id="swapem">
+        swap em
+    </div>
+</body>
+
+</html>
