@@ -1,4 +1,5 @@
 const windowOnlyEvents = new Set(['resize', 'Fullscreen', 'load']);
+const documentProbablyEvents = new Set(['scroll']);
 
 
 
@@ -8,7 +9,6 @@ const windowOnlyEvents = new Set(['resize', 'Fullscreen', 'load']);
 
 
 todo:
-? operator to put something in style and pull it back out
 timed events 
 do not dispose char in regexv
 data source and target database
@@ -112,9 +112,11 @@ customElements.define('garb-events', class RegEvents extends HTMLElement {
                                     const observeListener = new MutationObserver(mutations => {
                                         if (firstVal(ele) == secondVal(ele)) {
                                             ele[`${E.name}-register`] += char;
+                                            ele[`${E.name}-counter`]++;
                                             if (E.expr.test(ele[`${E.name}-register`])) {
                                                 callBacks.forEach(CB => CB(ele));
                                                 ele[`${E.name}-register`] = '';
+                                                ele[`${E.name}-counterArray`] = [];
                                             }
                                         }
                                     });
@@ -127,9 +129,11 @@ customElements.define('garb-events', class RegEvents extends HTMLElement {
                                     const observeListener = new MutationObserver(mutations => {
                                         if (firstVal(ele) != secondVal(ele)) {
                                             ele[`${E.name}-register`] += char;
+                                            ele[`${E.name}-counter`]++;
                                             if (E.expr.test(ele[`${E.name}-register`])) {
                                                 callBacks.forEach(CB => CB(ele));
                                                 ele[`${E.name}-register`] = '';
+                                                ele[`${E.name}-counterArray`] = [];
                                             }
                                         }
                                     });
@@ -143,9 +147,11 @@ customElements.define('garb-events', class RegEvents extends HTMLElement {
                                 return (ele, callBacks) => {
                                     BindAny(event, ele, () => {
                                         ele[`${E.name}-register`] += char;
+                                        ele[`${E.name}-counter`]++;
                                         if (E.expr.test(ele[`${E.name}-register`])) {
                                             callBacks.forEach(CB => CB(ele));
                                             ele[`${E.name}-register`] = '';
+                                            ele[`${E.name}-counterArray`] = [];
                                         }
                                     });
                                 };
@@ -158,6 +164,8 @@ customElements.define('garb-events', class RegEvents extends HTMLElement {
                         regularEvents[E.name] = (ele, callBack) => {
                             if (ele[`${E.name}-register`] == undefined) {
                                 ele[`${E.name}-register`] = '';
+                                ele[`${E.name}-counter`] = 0;
+                                ele[`${E.name}-counterArray`] = [];
                                 ele[`${E.name}-callbacks`] = [callBack];
                                 adders.forEach(adder => adder(ele, ele[`${E.name}-callbacks`]));
                             }
