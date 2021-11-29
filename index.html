@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 
-<head>
+<head> 
     <title>
         Roskakoripalo Markup Language
     </title>
@@ -13,10 +13,8 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes">
 </head>
 
-<body> 
-    <garb-events>
-
-        {cltwice}{cc}[
+<!--
+{cltwice}{cc}[
         clickThenResize as c;
         ]
 
@@ -25,7 +23,18 @@
         resize as A;
         ]
 
-        {Grey}{V}[
+
+background-color from "red"? when clickThenResize;
+        background-color from "blue"? when cltwice;
+-->
+ 
+
+<body> 
+    <garb-events>
+
+        
+
+        {Grey}{VVVV}[
         background-color becomes "grey"? as V;
         ] 
         
@@ -37,7 +46,7 @@
 
 
         {div.prepost}[
-        log from background-color when Grey;
+        log from "hi" when Grey;
         ]
 
 
@@ -68,8 +77,7 @@
 
         {div#toggleme}[
         swap innerText data-text when click;
-        background-color from "red"? when clickThenResize;
-        background-color from "blue"? when cltwice;
+        
         ]
 
     </garb-script>

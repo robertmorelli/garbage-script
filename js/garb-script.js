@@ -1,93 +1,112 @@
-const windowOnlyEvents = new Set(['resize', 'Fullscreen', 'load']);
-const documentProbablyEvents = new Set(['scroll']);
-
-
-
-
-
 /*
-
-
 todo:
 timed events 
 do not dispose char in regexv
 data source and target database
 keypress events
-
-
-
-
-
+while structure
 */
 
 
-
-//zip operator origin target
-const ziptt = (a, b, c) => a.map((k, i) => [k, [b[i]], [c[i]]]);
-const ziptA = (a, b, c) => a.map((k, i) => [k, c.map(() => b[i]), c]);
-const zipAH = (a, b, c) => a.map((k, i) => [k, b, c]);
-
-
-//events stred here
-var regularEvents = {};
-
-//Bind Tree
-const BindToWindow = (Event, ele, fun) => window.addEventListener(Event, fun);
-const BindToElement = (Event, ele, fun) => ele.addEventListener(Event, fun);
-const BindEvent = (Event, ele, fun) => (windowOnlyEvents.has(Event) ? BindToWindow : BindToElement)(Event, ele, fun)
-const BindRegEvent = (Event, ele, fun) => regularEvents[Event](ele, fun);
-const BindAny = (Event, ele, fun) => (Event in regularEvents ? BindRegEvent : BindEvent)(Event, ele, fun);
-
-function hi(){
-    console.log("hi");
-} 
-
-
-//determines the location of data and returns 
-//1  function to get it
-//2  function to store in location
-//3  the attributes where the data resides
-function lexLeftAndRight(firstItem, secondItem, ele) {
-    let firstVal, firstPlace, secondVal, secondPlace;
-    let key = new Set();
-    if (/\s*?call\s*?/s.test(firstItem)) {
-        [firstVal, firstPlace] = [(T) => {}, (T, V) => eval(V)];
-    } else if (/\s*?log\s*?/s.test(firstItem)) {
-        [firstVal, firstPlace] = [(T) => {}, (T, V) => console.log(V)];
-    } else if (/data-\S+/.test(firstItem)) {
-        key.add(firstItem);
-        [firstVal, firstPlace] = [(T) => T.dataset[/data-(\S+)/.exec(firstItem)[1]], (T, V) => { T.dataset[/data-(\S+)/.exec(firstItem)[1]] = V; }];
-    } else if (firstItem in ele) {
-        key.add(firstItem);
-        [firstVal, firstPlace] = [(T) => T[firstItem], (T, V) => { T[firstItem] = V; }];
-    } else if (firstItem in getComputedStyle(ele)) {
-        key.add('style');
-        [firstVal, firstPlace] = [(T) => getComputedStyle(T)[firstItem], (T, V) => { T.style += `;${firstItem}: ${V};`; }];
+class garbage {
+    //for deciding where to attatch listeners
+    static windowOnlyEvents = new Set(['resize', 'Fullscreen', 'load']);
+    static documentProbablyEvents = new Set(['scroll']);
+    //events stored here
+    static regularEvents = {};
+    //zip operator origin target
+    static ziptt(a, b, c) {
+        return a.map((k, i) => [k, [b[i]], [c[i]]]);
+    }
+    static ziptA(a, b, c) {
+        return a.map((k, i) => [k, c.map(() => b[i]), c]);
+    }
+    static zipAH(a, b, c) {
+        return a.map((k, i) => [k, b, c]);
     }
 
-    if (/data-\S+/.test(secondItem)) {
-        key.add(secondItem);
-        [secondVal, secondPlace] = [(T) => T.dataset[/data-(\S+)/.exec(secondItem)[1]], (T, V) => { T.dataset[/data-(\S+)/.exec(secondItem)[1]] = V; }];
-    } else if (secondItem in ele) {
-        key.add(secondItem);
-        [secondVal, secondPlace] = [(T) => T[secondItem], (T, V) => { T[secondItem] = V; }];
-    } else if (secondItem in getComputedStyle(ele)) {
-        key.add('style');
-        [secondVal, secondPlace] = [(T) => getComputedStyle(T)[secondItem], (T, V) => { T.style += `;${secondItem}: ${V};`; }];
-    } else if (/"[^"]+"\?/.test(secondItem)) {
-        firstPlace(ele, /"([^"]+)"\?/.exec(secondItem)[1]);
-        secondItem = firstVal(ele);
-        [secondVal, secondPlace] = [(T) => secondItem, (T, V) => { console.error("unable to store value in imm"); }];
-    }else if (/"[^"]+"/.test(secondItem)) {
-        [secondVal, secondPlace] = [(T) => /"([^"]+)"/.exec(secondItem)[1], (T, V) => { console.error("unable to store value in imm"); }];
+    //Bind to correct place
+    static BindAny(Event, ele, fun) {
+        if (Event in garbage.regularEvents)
+            garbage.regularEvents[Event](ele, fun)
+        else if (garbage.windowOnlyEvents.has(Event))
+            window.addEventListener(Event, fun)
+        else
+            ele.addEventListener(Event, fun)
     }
-    return [firstVal, firstPlace, secondVal, secondPlace, Array.from(key)];
+
+    //determines the location of data and returns 
+    //1  function to get it
+    //2  function to store in location
+    //3  the attributes where the data resides
+    static lexLeftAndRight(firstItem, secondItem, ele) {
+        let firstVal, firstPlace, secondVal, secondPlace;
+        let key = new Set();
+        if (/\s*?call\s*?/s.test(firstItem)) {
+            firstVal = (T) => { };
+            firstPlace = (T, V) => eval(V);
+        } else if (/\s*?log\s*?/s.test(firstItem)) {
+            firstVal = (T) => { };
+            firstPlace = (T, V) => console.log(V);
+        } else if (/data-\S+/.test(firstItem)) {
+            key.add(firstItem);
+            firstVal = (T) => T.dataset[/data-(\S+)/.exec(firstItem)[1]];
+            firstPlace = (T, V) => { T.dataset[/data-(\S+)/.exec(firstItem)[1]] = V; };
+        } else if (firstItem in ele) {
+            key.add(firstItem);
+            firstVal = (T) => T[firstItem];
+            firstPlace = (T, V) => { T[firstItem] = V; };
+        } else if (firstItem in getComputedStyle(ele)) {
+            key.add('style');
+            firstVal = (T) => getComputedStyle(T)[firstItem];
+            firstPlace = (T, V) => { T.style += `;${firstItem}: ${V};`; };
+        }
+        if (/data-\S+/.test(secondItem)) {
+            key.add(secondItem);
+            secondVal = (T) => T.dataset[/data-(\S+)/.exec(secondItem)[1]];
+            secondPlace = (T, V) => { T.dataset[/data-(\S+)/.exec(secondItem)[1]] = V; };
+        } else if (secondItem in ele) {
+            key.add(secondItem);
+            secondVal = (T) => T[secondItem];
+            secondPlace = (T, V) => { T[secondItem] = V; };
+        } else if (secondItem in getComputedStyle(ele)) {
+            key.add('style');
+            secondVal = (T) => getComputedStyle(T)[secondItem];
+            secondPlace = (T, V) => { T.style += `;${secondItem}: ${V};`; };
+        } else if (/"[^"]+"\?/.test(secondItem)) {
+            firstPlace(ele, /"([^"]+)"\?/.exec(secondItem)[1]);
+            secondItem = firstVal(ele);
+            secondVal = (T) => secondItem;
+            secondPlace = (T, V) => { console.error("unable to store value in imm"); };
+        } else if (/"[^"]+"/.test(secondItem)) {
+            secondVal = (T) => /"([^"]+)"/.exec(secondItem)[1];
+            secondPlace = (T, V) => { console.error("unable to store value in imm"); };
+        }
+        return [firstVal, firstPlace, secondVal, secondPlace, Array.from(key)];
+    }
+
+    //return function to handle adding chars events stuff
+    static lexRegisterChar(char) {
+        let putter;
+        if (/(\S)/.test(char)) {
+            putter = (T) => { T }
+        } else if (/\s+?(\S)\s+?to\s+?(\S)\s+?over\s+?(\S+?)s\s+?/.test(char)) {
+        } else if (/immortal\s+?(\S)/.test(char)) {
+        }
+        else if (/immortal\s+?(\S)\s+?to\s+?(\S)\s+?over\s+?(\S+?)s\s+?/.test(char)) {
+        }
+    }
+
+
 }
+
+
+
 
 //define event tag
 customElements.define('garb-events', class RegEvents extends HTMLElement {
     constructor() {
-        super(); 
+        super();
         const observer = new MutationObserver(mutations => {
             mutations.forEach(mutation => {
                 if (mutation.addedNodes.length && mutation.addedNodes[0].nodeType == 3) {
@@ -105,63 +124,39 @@ customElements.define('garb-events', class RegEvents extends HTMLElement {
                         //create a set of functions that attatch event listeners/mutation observers
                         let adders = E.work.map(W => {
                             //equality/inequality testers
+                            let _, firstItem, secondItem, char, firstVal, firstPlace, secondVal, secondPlace, key, event, trigger;
                             if (/\s*?(\S+?)\s+?becomes\s+?("??[^"]+?"??\???)\s+?as\s+?(\S)\s*?/s.test(W)) {
-                                let [_, firstItem, secondItem, char] = /\s*?(\S+?)\s+?becomes\s+?("??[^"]+?"??\???)\s+?as\s+?(\S)\s*?/s.exec(W);
-                                let [firstVal, firstPlace, secondVal, secondPlace, key] = lexLeftAndRight(firstItem, secondItem, this);
-                                return (ele, callBacks) => {
-                                    const observeListener = new MutationObserver(mutations => {
-                                        if (firstVal(ele) == secondVal(ele)) {
-                                            ele[`${E.name}-register`] += char;
-                                            ele[`${E.name}-counter`]++;
-                                            if (E.expr.test(ele[`${E.name}-register`])) {
-                                                callBacks.forEach(CB => CB(ele));
-                                                ele[`${E.name}-register`] = '';
-                                                ele[`${E.name}-counterArray`] = [];
-                                            }
-                                        }
-                                    });
+                                [_, firstItem, secondItem, char] = /\s*?(\S+?)\s+?becomes\s+?("??[^"]+?"??\???)\s+?as\s+?(\S)\s*?/s.exec(W);
+                                [firstVal, firstPlace, secondVal, secondPlace, key] = garbage.lexLeftAndRight(firstItem, secondItem, this);
+                                trigger = (ele, callBacks) => {
+                                    const observeListener = new MutationObserver(mutations => { if (firstVal(ele) == secondVal(ele)) fun(ele, callBacks); });
                                     observeListener.observe(ele, { attributes: true, attributeFilter: key });
                                 };
                             } else if (/\s*?(\S+?)\s+?becomes\s+?not\s+?("??[^"]+?"??\???)\s+?as\s+?(\S)\s*?/s.test(W)) {
-                                let [_, firstItem, secondItem, char] = /\s*?(\S+?)\s+?becomes\s+?not\s+?("??[^"]+?"??\???)\s+?as\s+?(\S)\s*?/s.exec(W);
-                                let [firstVal, firstPlace, secondVal, secondPlace, key] = lexLeftAndRight(firstItem, secondItem, this);
-                                return (ele, callBacks) => {
-                                    const observeListener = new MutationObserver(mutations => {
-                                        if (firstVal(ele) != secondVal(ele)) {
-                                            ele[`${E.name}-register`] += char;
-                                            ele[`${E.name}-counter`]++;
-                                            if (E.expr.test(ele[`${E.name}-register`])) {
-                                                callBacks.forEach(CB => CB(ele));
-                                                ele[`${E.name}-register`] = '';
-                                                ele[`${E.name}-counterArray`] = [];
-                                            }
-                                        }
-                                    });
+                                [_, firstItem, secondItem, char] = /\s*?(\S+?)\s+?becomes\s+?not\s+?("??[^"]+?"??\???)\s+?as\s+?(\S)\s*?/s.exec(W);
+                                [firstVal, firstPlace, secondVal, secondPlace, key] = garbage.lexLeftAndRight(firstItem, secondItem, this);
+                                trigger = (ele, callBacks, fun) => {
+                                    const observeListener = new MutationObserver(mutations => { if (firstVal(ele) != secondVal(ele)) fun(ele, callBacks); });
                                     observeListener.observe(ele, { attributes: true, attributeFilter: key });
                                 };
                             }
-                            //js event testers 
                             else if (/\s*?(\S+?)\s+?as\s+?(\S)\s*?/s.test(W)) {
-                                let [_, event, char] = /\s*?(\S+?)\s+?as\s+?(\S)\s*?/s.exec(W);
-                                //add keypress events
-                                return (ele, callBacks) => {
-                                    BindAny(event, ele, () => {
-                                        ele[`${E.name}-register`] += char;
-                                        ele[`${E.name}-counter`]++;
-                                        if (E.expr.test(ele[`${E.name}-register`])) {
-                                            callBacks.forEach(CB => CB(ele));
-                                            ele[`${E.name}-register`] = '';
-                                            ele[`${E.name}-counterArray`] = [];
-                                        }
-                                    });
-                                };
-
-                            }else {
-                                return (ele, callBacks) => { }
+                                [_, event, char] = /\s*?(\S+?)\s+?as\s+?(\S)\s*?/s.exec(W);
+                                trigger = (ele, callBacks, fun) => { garbage.BindAny(event, ele, () => { fun(ele, callBacks); }); };
                             }
+                            let fun = (ele, callBacks) => {
+                                ele[`${E.name}-register`] += char;
+                                ele[`${E.name}-counterArray`].push(++ele[`${E.name}-counter`]);
+                                if (E.expr.test(ele[`${E.name}-register`])) {
+                                    callBacks.forEach(CB => CB(ele));
+                                    ele[`${E.name}-register`] = '';
+                                    ele[`${E.name}-counterArray`] = [];
+                                }
+                            };
+                            return (ele, callBacks) => trigger(ele, callBacks, fun);
                         });
                         //a function to attatch functions or just one more callback
-                        regularEvents[E.name] = (ele, callBack) => {
+                        garbage.regularEvents[E.name] = (ele, callBack) => {
                             if (ele[`${E.name}-register`] == undefined) {
                                 ele[`${E.name}-register`] = '';
                                 ele[`${E.name}-counter`] = 0;
@@ -172,7 +167,6 @@ customElements.define('garb-events', class RegEvents extends HTMLElement {
                             else {
                                 ele[`${E.name}-callbacks`].push(callBack);
                             }
-                            return [()=>{adders}, ()=>{ele[`${E.name}-callbacks`]}]
                         };
                     });
                 }
@@ -181,7 +175,6 @@ customElements.define('garb-events', class RegEvents extends HTMLElement {
         observer.observe(this, { childList: true });
     }
 });
-
 
 customElements.define('garb-script', class GarbScript extends HTMLElement {
     constructor() {
@@ -215,18 +208,18 @@ customElements.define('garb-script', class GarbScript extends HTMLElement {
                         switch (Q.type) {
                             case 'tt':
                                 length = Math.min(operatorElements.length, originElements.length, targetElements.length);
-                                CallList = ziptt(operatorElements.slice(0, length), originElements.slice(0, length), targetElements.slice(0, length));
+                                CallList = garbage.ziptt(operatorElements.slice(0, length), originElements.slice(0, length), targetElements.slice(0, length));
                                 break;
                             case 'tA':
                                 length = Math.min(operatorElements.length, originElements.length);
-                                CallList = ziptA(operatorElements.slice(0, length), originElements.slice(0, length), targetElements);
+                                CallList = garbage.ziptA(operatorElements.slice(0, length), originElements.slice(0, length), targetElements);
                                 break;
                             case 'AH':
                                 length = Math.min(originElements.length, targetElements.length);
-                                CallList = zipAH(operatorElements, originElements.slice(0, length), targetElements.slice(0, length));
+                                CallList = garbage.zipAH(operatorElements, originElements.slice(0, length), targetElements.slice(0, length));
                                 break;
                             default:
-                                console.error(`${q.type} not a valid type. type must be one of these: tt, tA, AH`);
+                                console.error(`${Q.type} not a valid type. type must be one of these: tt, tA, AH`);
                                 return;
                         }
                         if (CallList.length == 0) { console.error(`An element selector failed to find any matches`); return; }
@@ -241,10 +234,10 @@ customElements.define('garb-script', class GarbScript extends HTMLElement {
                                 [_, firstItem, secondItem, ConditionEvent] = /\s*?swap\s+?([^"]+)\s+?([^"]+)\s+?when\s+?(\S+)\s*/sm.exec(W);
                                 workType = 'swap';
                             } else { console.error(`you fucked up the line ${W}`); return; }
-                            let [firstVal, firstPlace, secondVal, secondPlace, key] = lexLeftAndRight(firstItem, secondItem, this);
+                            let [firstVal, firstPlace, secondVal, secondPlace, key] = garbage.lexLeftAndRight(firstItem, secondItem, this);
                             if (workType == 'from')
                                 CallList.forEach(([oper, origs, targs]) => {
-                                    BindAny(ConditionEvent, oper, () => {
+                                    garbage.BindAny(ConditionEvent, oper, () => {
                                         origs.forEach((_, i) => {
                                             firstPlace(targs[i], secondVal(origs[i]));
                                         });
@@ -253,7 +246,7 @@ customElements.define('garb-script', class GarbScript extends HTMLElement {
                             else {
                                 if (Q.type == 'tA') {
                                     CallList.forEach(([oper, origs, targs]) => {
-                                        BindAny(ConditionEvent, oper, () => {
+                                        garbage.BindAny(ConditionEvent, oper, () => {
                                             origs.forEach((_, i) => {
                                                 let temp = firstVal(targs[i]);
                                                 firstPlace(targs[i], secondVal(targs[i]));
@@ -263,7 +256,7 @@ customElements.define('garb-script', class GarbScript extends HTMLElement {
                                     });
                                 } else {
                                     CallList.forEach(([oper, origs, targs]) => {
-                                        BindAny(ConditionEvent, oper, () => {
+                                        garbage.BindAny(ConditionEvent, oper, () => {
                                             origs.forEach((_, i) => {
                                                 let temp = firstVal(targs[i]);
                                                 firstPlace(targs[i], secondVal(origs[i]));
@@ -282,25 +275,8 @@ customElements.define('garb-script', class GarbScript extends HTMLElement {
     }
 });
 
-
-
-
-
-
-
-
-function definePrimative(String, [load, store], Key){
-    
-}
-
-function defineExtention(Test, Generator){
+function definePrimative(String, [load, store], Key) { }
+function defineExtention(Test, Generator) {
     //Test(String: arg) -> True/False
     //Generator(String: arg, Ele) -> [Load(T) -> Any , Store(T,V) -> None, Keys]
 }
-
-
-
-
-
-
-
