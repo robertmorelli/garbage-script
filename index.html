@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html>
 
 <head> 
@@ -13,8 +13,12 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes">
 </head>
 
-<!--
-{cltwice}{cc}[
+ 
+
+<body> 
+    <garb-events>
+
+        {cltwice}{cc}[
         clickThenResize as c;
         ]
 
@@ -23,23 +27,17 @@
         resize as A;
         ]
 
-
-background-color from "red"? when clickThenResize;
-        background-color from "blue"? when cltwice;
--->
- 
-
-<body> 
-    <garb-events>
-
-        
-
         {Grey}{VVVV}[
         background-color becomes "grey"? as V;
         ] 
         
     </garb-events>
     <garb-script>
+        {div.prepost}{div.prepost}{div.prepost}(tt)[
+        log from "lemons" when mouseout;
+        ]
+
+
         {div.selectme}{div.prepost}{div.prepost}[
         background-color from data-truecolor when mouseout;
         ]
@@ -77,7 +75,8 @@ background-color from "red"? when clickThenResize;
 
         {div#toggleme}[
         swap innerText data-text when click;
-        
+        background-color from "red"? when clickThenResize;
+        background-color from "blue"? when cltwice;
         ]
 
     </garb-script>
