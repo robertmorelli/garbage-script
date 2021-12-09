@@ -66,11 +66,17 @@ while structure
             key.add('style');
             firstVal = (T) => getComputedStyle(T)[firstItem];
             firstPlace = (T, V) => { T.style += `;${firstItem}: ${V};`; };
-        }
+        } else if (/--\S+/.test(firstItem)) {
+            key.add('style');
+            firstVal = (T) => getComputedStyle(T).getPropertyValue(firstItem);
+            firstPlace = (T, V) => { T.style.setProperty(firstItem, V) };
+        } else{console.error(firstItem)}
+
         if (/data-\S+/.test(secondItem)) {
             key.add(secondItem);
-            secondVal = (T) => T.dataset[/data-(\S+)/.exec(secondItem)[1]];
-            secondPlace = (T, V) => { T.dataset[/data-(\S+)/.exec(secondItem)[1]] = V; };
+            let strin = /data-(\S+)/.exec(secondItem)[1];
+            secondVal = (T) => T.dataset[strin];
+            secondPlace = (T, V) => { T.dataset[strin] = V; };
         } else if (secondItem in ele) {
             key.add(secondItem);
             secondVal = (T) => T[secondItem];
@@ -79,6 +85,10 @@ while structure
             key.add('style');
             secondVal = (T) => getComputedStyle(T)[secondItem];
             secondPlace = (T, V) => { T.style += `;${secondItem}: ${V};`; };
+        } else if (/--\S+/.test(secondItem)) {
+            key.add('style');
+            secondVal = (T) => getComputedStyle(T).getPropertyValue(secondItem);
+            secondPlace = (T, V) => { T.style.setProperty(secondItem, V) };
         } else if (/"[^"]+"\?/.test(secondItem)) {
             firstPlace(ele, /"([^"]+)"\?/.exec(secondItem)[1]);
             secondItem = firstVal(ele);
@@ -87,7 +97,8 @@ while structure
         } else if (/"[^"]+"/.test(secondItem)) {
             secondVal = (T) => /"([^"]+)"/.exec(secondItem)[1];
             secondPlace = (T, V) => { console.error("unable to store value in imm"); };
-        }
+        }else{console.error(secondItem)}
+        
         return [firstVal, firstPlace, secondVal, secondPlace, Array.from(key)];
     }
     function getElementsAsThreeArrays(Q) {
@@ -132,29 +143,34 @@ while structure
                         //equality/inequality testers
                         let _, firstItem, secondItem, char, firstVal, firstPlace, secondVal, secondPlace, key, event;
                         let trigger, tester, eventJob;
-                        if (/\s*?(\S+?)\s+?becomes\s+?("??[^"]+?"??\???)\s+?as\s+?(\S)\s*?/s.test(W)) {
-                            [_, firstItem, secondItem, char] = /\s*?(\S+?)\s+?becomes\s+?("??[^"]+?"??\???)\s+?as\s+?(\S)\s*?/s.exec(W);
-                            [firstVal, firstPlace, secondVal, secondPlace, key] = lexLeftAndRight(firstItem, secondItem, this);
-                            trigger = (ele, callBacks) => {
-                                const observeListener = new MutationObserver(() => {
-                                    if (firstVal(ele) == secondVal(ele)) eventJob(ele, callBacks);
-                                });
-                                observeListener.observe(ele, { attributes: true, attributeFilter: key });
-                            };
-                        } else if (/\s*?(\S+?)\s+?becomes\s+?not\s+?("??[^"]+?"??\???)\s+?as\s+?(\S)\s*?/s.test(W)) {
-                            [_, firstItem, secondItem, char] = /\s*?(\S+?)\s+?becomes\s+?not\s+?("??[^"]+?"??\???)\s+?as\s+?(\S)\s*?/s.exec(W);
-                            [firstVal, firstPlace, secondVal, secondPlace, key] = lexLeftAndRight(firstItem, secondItem, this);
-                            trigger = (ele, callBacks) => {
-                                const observeListener = new MutationObserver(() => {
-                                    if (firstVal(ele) != secondVal(ele)) eventJob(ele, callBacks);
-                                });
-                                observeListener.observe(ele, { attributes: true, attributeFilter: key });
-                            };
-                        }
-                        else if (/\s*?(\S+?)\s+?as\s+?(\S)\s*?/s.test(W)) {
-                            [_, event, char] = /\s*?(\S+?)\s+?as\s+?(\S)\s*?/s.exec(W);
-                            trigger = (ele, callBacks) => { BindAny(event, ele, () => { eventJob(ele, callBacks); }); };
-                        }
+                        if (/\s*?(\S+?)\s+?becomes\s+?("??[^"]+?"??\???)\s+?as\s+?(\S)\s*?/s.test(W))
+                            [_, firstItem, secondItem, char] =
+                                /\s*?(\S+?)\s+?becomes\s+?("??[^"]+?"??\???)\s+?as\s+?(\S)\s*?/s.exec(W),
+                                [firstVal, firstPlace, secondVal, secondPlace, key] =
+                                lexLeftAndRight(firstItem, secondItem, this),
+                                trigger = (ele, callBacks) => {
+                                    const observeListener = new MutationObserver(() => {
+                                        if (firstVal(ele) == secondVal(ele)) eventJob(ele, callBacks);
+                                    });
+                                    observeListener.observe(ele, { attributes: true, attributeFilter: key });
+                                };
+                        else if (/\s*?(\S+?)\s+?becomes\s+?not\s+?("??[^"]+?"??\???)\s+?as\s+?(\S)\s*?/s.test(W))
+                            [_, firstItem, secondItem, char] =
+                                /\s*?(\S+?)\s+?becomes\s+?not\s+?("??[^"]+?"??\???)\s+?as\s+?(\S)\s*?/s.exec(W),
+                                [firstVal, firstPlace, secondVal, secondPlace, key] =
+                                lexLeftAndRight(firstItem, secondItem, this),
+                                trigger = (ele, callBacks) => {
+                                    const observeListener = new MutationObserver(() => {
+                                        if (firstVal(ele) != secondVal(ele)) eventJob(ele, callBacks);
+                                    });
+                                    observeListener.observe(ele, { attributes: true, attributeFilter: key });
+                                };
+
+                        else if (/\s*?(\S+?)\s+?as\s+?(\S)\s*?/s.test(W))
+                            [_, event, char] =
+                                /\s*?(\S+?)\s+?as\s+?(\S)\s*?/s.exec(W),
+                                trigger = (ele, callBacks) => { BindAny(event, ele, () => { eventJob(ele, callBacks); }); };
+
                         eventJob = (ele, callBacks) => {
                             ele[`${E.name}-register`] += char;
                             ele[`${E.name}-counterArray`].push(++ele[`${E.name}-counter`]);
@@ -193,10 +209,6 @@ while structure
                 let text = this.innerText
                 for (let __ of _) if (!(__.addedNodes.length && __.addedNodes[0].nodeType == 3)) observer.disconnect();
                 if (!text) return;
-                //prevent display
-                this.style += ';display: none;';
-                this.innerHTML = `<![CDATA[ ${text} ]]>`;
-
                 //now we do stuff
                 text.split(/(?<=])\s*?(?=\{)/).map(E => {
                     let _, operator, origin, target, type, work;
@@ -209,13 +221,17 @@ while structure
                         [_, origin, target, work] = scriptTwoParams.exec(E), type = 'tA';
                     else if (E.match(scriptOneParams))
                         [_, origin, work] = scriptOneParams.exec(E), type = 'tt';
-                    else { console.error(`you fucked up the selector ${E}`); return; }
-
+                    else {
+                        console.log(E);
+                        console.error(`you fucked up the selector ${E}`); return;
+                    }
+                    operator = operator || origin;
+                    target = target || origin;
                     return {
                         type: type,
-                        operator: operator || origin,
+                        operator: operator,
                         origin: origin,
-                        target: target || origin,
+                        target: target,
                         work: work.split(/\s*?\;\s*/m)
                     };
 
@@ -318,7 +334,6 @@ while structure
                         }
                     });
                 });
-
             });
             observer.observe(this, { childList: true });
         }
@@ -329,4 +344,15 @@ while structure
         //Test(String: arg) -> True/False
         //Generator(String: arg, Ele) -> [Load(T) -> Any , Store(T,V) -> None, Keys]
     }
+
+
+
 }
+/*
+page table register points to ram where page table is
+tlb caches page table stuff
+
+page table is in ram and lists all virtual memory addresses
+
+
+*/

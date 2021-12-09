@@ -4,6 +4,10 @@ body {
     flex-wrap: wrap;
 }
 
+garb-script,garb-events,tie-vars{
+    display: none;
+}
+
 * {
     user-select: none;
     margin: 0;
@@ -65,4 +69,12 @@ div div.selectme:nth-child(7) {
 
 div.swapme {
     height: 32px;
+}
+
+div.varme{
+    --color-variable: white;
+}
+div.varme>div{
+    height: 30px;
+    color: var(--color-variable);
 }

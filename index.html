@@ -7,13 +7,14 @@
     </title>
 
     <script src="js/garb-script.js"></script>
+    <script differ src="js/tie-vars.js"></script>
     <link rel="stylesheet" type="text/css" href="css/style.css"/>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes">
 </head>
 
- 
+
 
 <body> 
     <garb-events>
@@ -79,6 +80,9 @@
         background-color from "blue"? when cltwice;
         ]
 
+        {.varme}[
+        data-color from "red" when click;
+        ]
     </garb-script>
     <div draggable="true" class="prepost" data-truecolor="grey">
         pre
@@ -141,6 +145,16 @@
     <div id="swapem">
         swap em
     </div>
+    <div class="varme">
+        <div>
+            hello please fix
+        </div>
+    </div>
+    <tie-vars>
+        {.varme}[
+        tie --color-variable to data-color;
+        ]
+    </tie-vars>
 </body>
 
 </html>
