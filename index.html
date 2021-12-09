@@ -6,17 +6,17 @@
         Roskakoripalo Markup Language
     </title>
 
-    <script src="js/garb-script.js"></script>
-    <script differ src="js/tie-vars.js"></script>
     <link rel="stylesheet" type="text/css" href="css/style.css"/>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes">
+    <script src="js/garb-script.js"></script>
 </head>
 
 
 
-<body> 
+<body onload="tieVarsInterface('.varme>div', [['data-value', '--size']]);"> 
+    
     <garb-events>
 
         {cltwice}{cc}[
@@ -80,8 +80,8 @@
         background-color from "blue"? when cltwice;
         ]
 
-        {.varme}[
-        data-color from "red" when click;
+        {.varme>input}{.varme>input}{.varme>div}(tt)[
+        data-value from value when input;
         ]
     </garb-script>
     <div draggable="true" class="prepost" data-truecolor="grey">
@@ -146,15 +146,10 @@
         swap em
     </div>
     <div class="varme">
-        <div>
-            hello please fix
-        </div>
+        <input type="range" min="1" max="4"/>
+        <div>hi</div>
     </div>
-    <tie-vars>
-        {.varme}[
-        tie --color-variable to data-color;
-        ]
-    </tie-vars>
+    <script differ src="js/tie-vars.js"></script>
 </body>
 
 </html>

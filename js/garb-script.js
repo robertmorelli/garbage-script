@@ -6,7 +6,20 @@ data source and target database
 keypres events
 while structure
 */
+let mega = new Set();
+
 {
+    function setMega() {
+        let addElementsToMega = (ele) => {
+            for (let i in ele)
+                mega.add(i);
+            if (ele.children)
+                Array.from(ele.children).forEach(addElementsToMega)
+        }
+        addElementsToMega(document.querySelector('body'));
+        setMegaFlag = false;
+    }
+
     //script line parsers
     let scriptFullControll = /\{([^\{\}]+?)\}\s*?\{([^\{\}]+?)\}\s*?\{([^\{\}]+?)\}\s*?\(\s*?([At][tHA])\s*?\)\s*?\[\s*?([^\[\]]+?)\s*?;\s*?\]/gs;
     let scriptThreeParams = /\{([^\{\}]+?)\}\s*?\{([^\{\}]+?)\}\s*?\{([^\{\}]+?)\}\s*?\[\s*?([^\[\]]+?)\s*?;\s*?\]/gs;
@@ -46,6 +59,7 @@ while structure
     //2  function to store in location
     //3  the attributes where the data resides
     function lexLeftAndRight(firstItem, secondItem, ele) {
+        setMega();
         let firstVal, firstPlace, secondVal, secondPlace;
         let key = new Set();
         if (/\s*?call\s*?/s.test(firstItem)) {
@@ -58,10 +72,6 @@ while structure
             key.add(firstItem);
             firstVal = (T) => T.dataset[/data-(\S+)/.exec(firstItem)[1]];
             firstPlace = (T, V) => { T.dataset[/data-(\S+)/.exec(firstItem)[1]] = V; };
-        } else if (firstItem in ele) {
-            key.add(firstItem);
-            firstVal = (T) => T[firstItem];
-            firstPlace = (T, V) => { T[firstItem] = V; };
         } else if (firstItem in getComputedStyle(ele)) {
             key.add('style');
             firstVal = (T) => getComputedStyle(T)[firstItem];
@@ -70,17 +80,17 @@ while structure
             key.add('style');
             firstVal = (T) => getComputedStyle(T).getPropertyValue(firstItem);
             firstPlace = (T, V) => { T.style.setProperty(firstItem, V) };
-        } else{console.error(firstItem)}
+        } else if (mega.has(firstItem)) {
+            key.add(firstItem);
+            firstVal = (T) => T[firstItem];
+            firstPlace = (T, V) => { T[firstItem] = V; };
+        } else { console.error(firstItem); console.error(ele) }
 
         if (/data-\S+/.test(secondItem)) {
             key.add(secondItem);
             let strin = /data-(\S+)/.exec(secondItem)[1];
             secondVal = (T) => T.dataset[strin];
             secondPlace = (T, V) => { T.dataset[strin] = V; };
-        } else if (secondItem in ele) {
-            key.add(secondItem);
-            secondVal = (T) => T[secondItem];
-            secondPlace = (T, V) => { T[secondItem] = V; };
         } else if (secondItem in getComputedStyle(ele)) {
             key.add('style');
             secondVal = (T) => getComputedStyle(T)[secondItem];
@@ -89,6 +99,10 @@ while structure
             key.add('style');
             secondVal = (T) => getComputedStyle(T).getPropertyValue(secondItem);
             secondPlace = (T, V) => { T.style.setProperty(secondItem, V) };
+        } else if (mega.has(secondItem)) {
+            key.add(secondItem);
+            secondVal = (T) => T[secondItem];
+            secondPlace = (T, V) => { T[secondItem] = V; };
         } else if (/"[^"]+"\?/.test(secondItem)) {
             firstPlace(ele, /"([^"]+)"\?/.exec(secondItem)[1]);
             secondItem = firstVal(ele);
@@ -97,8 +111,7 @@ while structure
         } else if (/"[^"]+"/.test(secondItem)) {
             secondVal = (T) => /"([^"]+)"/.exec(secondItem)[1];
             secondPlace = (T, V) => { console.error("unable to store value in imm"); };
-        }else{console.error(secondItem)}
-        
+        } else { console.error(secondItem); console.error(ele) }
         return [firstVal, firstPlace, secondVal, secondPlace, Array.from(key)];
     }
     function getElementsAsThreeArrays(Q) {

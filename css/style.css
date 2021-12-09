@@ -71,10 +71,8 @@ div.swapme {
     height: 32px;
 }
 
-div.varme{
-    --color-variable: white;
-}
+
 div.varme>div{
-    height: 30px;
-    color: var(--color-variable);
+    --size: 1;
+    height: calc(var(--size) * 30px);
 }
