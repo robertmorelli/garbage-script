@@ -1,5 +1,4 @@
 body {
-
     display: flex;
     flex-wrap: wrap;
 }
@@ -13,6 +12,7 @@ garb-script,garb-events,tie-vars{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-style:italic;
 }
 
 div,
@@ -73,6 +73,12 @@ div.swapme {
 
 
 div.varme>div{
-    --size: 1;
+    --color: grey;
+    --size: 3;
+    background-color:var(--color);
     height: calc(var(--size) * 30px);
+}
+div.varme>input{
+    --size: 3;
+    width: calc(var(--size) * 30px);
 }

@@ -15,10 +15,8 @@
 
 
 
-<body onload="tieVarsInterface('.varme>div', [['data-value', '--size']]);"> 
-    
+<body onload="tieVarsInterface('.varme>div', [['data-value', '--size'], ['data-color', '--color']]);"> 
     <garb-events>
-
         {cltwice}{cc}[
         clickThenResize as c;
         ]
@@ -30,8 +28,10 @@
 
         {Grey}{VVVV}[
         background-color becomes "grey"? as V;
-        ] 
-        
+        ]
+
+
+
     </garb-events>
     <garb-script>
         {div.prepost}{div.prepost}{div.prepost}(tt)[
@@ -80,10 +80,24 @@
         background-color from "blue"? when cltwice;
         ]
 
-        {.varme>input}{.varme>input}{.varme>div}(tt)[
+        {.varme>input}{.varme>input}{.varme>div}(tA)[
         data-value from value when input;
         ]
+
+        {.varme>select}{.varme>div}[
+        background-color from value when input;
+        ]
+
+
     </garb-script>
+    <tie-vars>
+        {.varme>div}[
+        tie --size to data-value;
+        tie --color to data-color;
+        ]
+    </tie-vars>
+    <div id="dataTag" style="display: none;"></div>
+    <!--tieVarsInterface('.varme>div', [['data-value', '--size'],['data-color', '--color']]);-->
     <div draggable="true" class="prepost" data-truecolor="grey">
         pre
     </div>
@@ -146,10 +160,15 @@
         swap em
     </div>
     <div class="varme">
-        <input type="range" min="1" max="4"/>
+        <input class="sizer" type="range" min="1" max="4" step=".1"/>
+        <select value="grey">
+            <option value="red">red</option>
+            <option value="green">green</option>
+            <option value="blue">blue</option>
+            <option value="orange">orange</option>
+        </select>
         <div>hi</div>
     </div>
-    <script differ src="js/tie-vars.js"></script>
 </body>
 
 </html>

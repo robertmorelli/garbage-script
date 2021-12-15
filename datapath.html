@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Grabage Can
+    </title>
+
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes">
+    <script src="js/garb-script.js"></script>
+    <style>
+        body{
+            display: block;
+        }
+        div.operator {
+            background-color: grey;
+        }
+
+        div.source:nth-child(1) {
+            background-color: red;
+        }
+
+        div.source:nth-child(2) {
+            background-color: orange;
+        }
+
+        div.source:nth-child(3) {
+            background-color: yellow;
+        }
+
+        div.source:nth-child(4) {
+            background-color: green;
+        }
+
+        div.source:nth-child(5) {
+            background-color: blue;
+        }
+
+        div.source:nth-child(6) {
+            background-color: purple;
+        }
+
+        div.container {
+            background-color: white;
+            width: 100vw;
+            height: 100vh;
+            border: none;
+            overflow: scroll;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        div.container>div{
+            width: 100vw;
+            background-color: white;
+            border: none;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+        
+    </style>
+</head>
+
+
+
+<body>
+    <garb-script>
+        {div.tt1}{div.tt2}{div.tt3}(tt)[
+        background-color from background-color when mouseover;
+        background-color from "grey"? when mouseout;
+        ]
+        {div.tA1}{div.tA2}{div.tA3}(tA)[
+        background-color from background-color when mouseover;
+        background-color from "grey"? when mouseout;
+        ]
+        {div.AH1}{div.AH2}{div.AH3}(AH)[
+        background-color from background-color when mouseover;
+        background-color from "grey"? when mouseout;
+        ]
+    </garb-script>
+    <div class="container">
+        <div>
+            <div class="operator tt1">hover me</div>
+            <div class="operator tt1">hover me</div>
+            <div class="operator tt1">hover me</div>
+            <div class="operator tt1">hover me</div>
+            <div class="operator tt1">hover me</div>
+            <div class="operator tt1">hover me</div>
+        </div>
+        <div>
+            <div class="source tt2">data source</div>
+            <div class="source tt2">data source</div>
+            <div class="source tt2">data source</div>
+            <div class="source tt2">data source</div>
+            <div class="source tt2">data source</div>
+            <div class="source tt2">data source</div>
+        </div>
+        <div>
+            <div class="destination tt3">data destination</div>
+            <div class="destination tt3">data destination</div>
+            <div class="destination tt3">data destination</div>
+            <div class="destination tt3">data destination</div>
+            <div class="destination tt3">data destination</div>
+            <div class="destination tt3">data destination</div>
+        </div>
+        <br><br><br><br>
+        <div>
+            <div class="operator tA1">hover me</div>
+            <div class="operator tA1">hover me</div>
+            <div class="operator tA1">hover me</div>
+            <div class="operator tA1">hover me</div>
+            <div class="operator tA1">hover me</div>
+            <div class="operator tA1">hover me</div>
+        </div>
+        <div>
+            <div class="source tA2">data source</div>
+            <div class="source tA2">data source</div>
+            <div class="source tA2">data source</div>
+            <div class="source tA2">data source</div>
+            <div class="source tA2">data source</div>
+            <div class="source tA2">data source</div>
+        </div>
+        <div>
+            <div class="destination tA3">data destination</div>
+            <div class="destination tA3">data destination</div>
+            <div class="destination tA3">data destination</div>
+            <div class="destination tA3">data destination</div>
+            <div class="destination tA3">data destination</div>
+            <div class="destination tA3">data destination</div>
+        </div>
+        <br><br><br><br>
+        <div>
+            <div class="operator AH1">hover me</div>
+            <div class="operator AH1">hover me</div>
+            <div class="operator AH1">hover me</div>
+            <div class="operator AH1">hover me</div>
+            <div class="operator AH1">hover me</div>
+            <div class="operator AH1">hover me</div>
+        </div>
+        <div>
+            <div class="source AH2">data source</div>
+            <div class="source AH2">data source</div>
+            <div class="source AH2">data source</div>
+            <div class="source AH2">data source</div>
+            <div class="source AH2">data source</div>
+            <div class="source AH2">data source</div>
+        </div>
+        <div>
+            <div class="destination AH3">data destination</div>
+            <div class="destination AH3">data destination</div>
+            <div class="destination AH3">data destination</div>
+            <div class="destination AH3">data destination</div>
+            <div class="destination AH3">data destination</div>
+            <div class="destination AH3">data destination</div>
+        </div>
+    </div>
+</body>
+
+</html>

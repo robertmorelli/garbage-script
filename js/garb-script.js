@@ -6,6 +6,18 @@ data source and target database
 keypres events
 while structure
 */
+
+
+let destroyTieVars;
+let tieVarsOfString;
+let tieVarsInterface;
+let TieVarsRecord = {};
+
+
+
+
+window.addEventListener('load',()=>loadGarb());
+
 let mega = new Set();
 
 {
@@ -17,7 +29,13 @@ let mega = new Set();
                 Array.from(ele.children).forEach(addElementsToMega)
         }
         addElementsToMega(document.querySelector('body'));
-        setMegaFlag = false;
+    }
+
+    function loadGarb(script=true, events=true, tie=true) {
+        setMega();
+        if(script) defineGarb();
+        if(events) defineGarbEvents();
+        if(tie)defineTieVars();
     }
 
     //script line parsers
@@ -131,20 +149,11 @@ let mega = new Set();
     }
 
     //define event tag
-    customElements.define('garb-events', class RegEvents extends HTMLElement {
-        constructor() {
-            super();
-            const observer = new MutationObserver(_ => {
-                //dumb shit
-                let text = this.innerText
-                for (let __ of _) if (!(__.addedNodes.length && __.addedNodes[0].nodeType == 3)) observer.disconnect();
-                if (!text) return;
-                //prevent display
-                this.style += ';display: none;';
-                this.innerHTML = `<![CDATA[ ${text} ]]>`;
-
-                //now we do stuff
-                text.split(/(?<=])\s*?(?=\{)/).map(E => {
+    function defineGarbEvents() {
+        customElements.define('garb-events', class RegEvents extends HTMLElement {
+            constructor() {
+                super();
+                this.innerText.split(/(?<=])\s*?(?=\{)/).map(E => {
                     //test the type and return the object
                     if (/\s*?\{([^\}]*?)\}\s*?\{([^\}]*?)\}\s*?\[\s*?([^\]]*?)\s*?;\s*?\]/gms.test(E)) {
                         let [_, name, expr, work] = /\s*?\{([^\}]*?)\}\s*?\{([^\}]*?)\}\s*?\[\s*?(\S+?[^\]]*?)\s*?;\s*?\]/gms.exec(E);
@@ -209,21 +218,15 @@ let mega = new Set();
                         }
                     };
                 });
-            });
-            observer.observe(this, { childList: true });
-        }
-    });
+            }
+        });
+    }
 
-    customElements.define('garb-script', class GarbScript extends HTMLElement {
-        constructor() {
-            super();
-            const observer = new MutationObserver(_ => {
-                //dumb shit
-                let text = this.innerText
-                for (let __ of _) if (!(__.addedNodes.length && __.addedNodes[0].nodeType == 3)) observer.disconnect();
-                if (!text) return;
-                //now we do stuff
-                text.split(/(?<=])\s*?(?=\{)/).map(E => {
+    function defineGarb() {
+        customElements.define('garb-script', class GarbScript extends HTMLElement {
+            constructor() {
+                super();
+                this.innerText.split(/(?<=])\s*?(?=\{)/).map(E => {
                     let _, operator, origin, target, type, work;
                     //test type and infer data path as required
                     if (E.match(scriptFullControll))
@@ -235,7 +238,7 @@ let mega = new Set();
                     else if (E.match(scriptOneParams))
                         [_, origin, work] = scriptOneParams.exec(E), type = 'tt';
                     else {
-                        console.log(E);
+                        console.error(E);
                         console.error(`you fucked up the selector ${E}`); return;
                     }
                     operator = operator || origin;
@@ -347,25 +350,106 @@ let mega = new Set();
                         }
                     });
                 });
-            });
-            observer.observe(this, { childList: true });
-        }
-    });
 
-    function definePrimative(String, [load, store], Key) { }
-    function defineExtention(Test, Generator) {
-        //Test(String: arg) -> True/False
-        //Generator(String: arg, Ele) -> [Load(T) -> Any , Store(T,V) -> None, Keys]
+            }
+        });
     }
 
 
+    function defineTieVars() {
+        tieVarsInterface = (selector, primativeJobs) => {
+            if (selector in TieVarsRecord) {
+                console.warn('die');
+            }
+            else {
+                TieVarsRecord[selector] = [];
+            }
+            let jobs = {};
+            primativeJobs.map(([elementAttribute, stylePropertyVar]) => {
+                if (/data-(\S+)/.test(elementAttribute)) {
+                    let DataAttribute = /data-(\S+)/.exec(elementAttribute)[1];
+                    jobs[elementAttribute] = (e) => { e.style.setProperty(stylePropertyVar, e.dataset[DataAttribute]); };
+                }
+                else
+                    jobs[elementAttribute] = (e) => e.style.setProperty(stylePropertyVar, e[elementAttribute]);
+            });
+            let elements = document.querySelectorAll(selector);
+            elements.forEach(E => {
+                const observeAttribute = new MutationObserver(muts => {
+                    muts.forEach(mut => { if (mut.attributeName in jobs) jobs[mut.attributeName](E); });
+                });
+                TieVarsRecord[selector].push([E.id, E, observeAttribute]);
+                observeAttribute.observe(E, { attributes: true, childList: true });
+            }
+            );
+
+        };
+        tieVarsOfString = (text) => {
+            //split between a closing ] and an opening {
+            text.split(/(?<=])\s*?(?=\{)/).map(E => {
+                let _; //for garbage
+                let work, selector;
+                {
+                    let workString;
+                    //get {...this...}[...and this...;]
+                    [_, selector, workString] = /\s*?{([^\{\}]+?)}\s*?\[\s*?([^\[\]]+?)\s*?;\s*?\]/gms.exec(E);
+                    //every line as an array
+                    work = workString.split(/[\s\n]*?;[\s\n]*?/gms);
+                }
+
+
+                let jobs = {};
+                work.map(W => {
+                    let stylePropertyVar, elementAttribute;
+                    [_, _, stylePropertyVar, _, elementAttribute] = W.split(' ');
+                    console.log(stylePropertyVar, _, elementAttribute)
+                    if (/data-(\S+)/.test(elementAttribute)) {
+                        let DataAttribute = /data-(\S+)/.exec(elementAttribute)[1];
+                        jobs[elementAttribute] = (e) => e.style.setProperty(stylePropertyVar, e.dataset[DataAttribute]);
+                    }
+                    else
+                        jobs[elementAttribute] = (e) => e.style.setProperty(stylePropertyVar, e[elementAttribute]);
+                });
+                //get elements by selector
+                let ellList = document.querySelectorAll(selector);
+
+
+                if (selector in TieVarsRecord) {
+                    console.warn(`selector '${selector}' appears at least twice in code. bindings will be stored in the format ${selector}(%)`);
+                }
+                TieVarsRecord[selector] = [];
+                ellList.forEach((E, i) => {
+                    const observeAttribute = new MutationObserver(muts => {
+                        muts.forEach(mut => { if (mut.attributeName in jobs) jobs[mut.attributeName](E); });
+                    });
+                    TieVarsRecord[selector].push([E.id, E, observeAttribute]);
+                    observeAttribute.observe(E, { attributes: true, childList: true });
+                });
+            })
+        };
+
+        customElements.define('tie-vars', class tieVars extends HTMLElement {
+            constructor() {
+                //if its required then why do i have to type it
+                super();
+                //catch all tie vars element inner strings and apply language
+                const observer = new MutationObserver(M => {
+                    //dumb shit
+                    let _;
+                    let text = this.innerText
+                    for (let m of M) if (!(m.addedNodes.length && m.addedNodes[0].nodeType == 3)) observer.disconnect();
+                    if (!text) return;
+                    //now we do stuff
+                    tieVarsOfString(text);
+                });
+                observer.observe(this, { childList: true });
+            }
+        });
+        destroyTieVars = (selector) => {
+            TieVarsRecord[selector].map(([_, __, obs]) => { obs.disconnect(); });
+            TieVarsRecord[selector].map(E => delete E);
+            delete TieVarsRecord[selector];
+        };
+    }
 
 }
-/*
-page table register points to ram where page table is
-tlb caches page table stuff
-
-page table is in ram and lists all virtual memory addresses
-
-
-*/
