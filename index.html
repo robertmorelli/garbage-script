@@ -3,7 +3,7 @@
 
 <head> 
     <title>
-        Roskakoripalo Markup Language
+        Garban test file
     </title>
 
     <link rel="stylesheet" type="text/css" href="css/style.css"/>
@@ -11,11 +11,15 @@
     <meta name="viewport" content="width=device-width">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes">
     <script src="js/garb-script.js"></script>
+    <script src="js/garb-events.js"></script>
+    <script src="js/tie-vars.js"></script>
+    <script src="js/garbSettup.js"></script>
 </head>
 
 
 
-<body onload="tieVarsInterface('.varme>div', [['data-value', '--size'], ['data-color', '--color']]);"> 
+<body onload="//tieVarsInterface('.varme>div', [['data-value', '--size'], ['data-color', '--color']]);
+    //data-value from value when input;"> 
     <garb-events>
         {cltwice}{cc}[
         clickThenResize as c;
@@ -29,9 +33,6 @@
         {Grey}{VVVV}[
         background-color becomes "grey"? as V;
         ]
-
-
-
     </garb-events>
     <garb-script>
         {div.prepost}{div.prepost}{div.prepost}(tt)[
@@ -81,11 +82,11 @@
         ]
 
         {.varme>input}{.varme>input}{.varme>div}(tA)[
-        data-value from value when input;
+        --size from value when input;
         ]
 
-        {.varme>select}{.varme>div}[
-        background-color from value when input;
+        {.varme>select}{.varme>select}{.varme>div}(tA)[
+        --color from value when input;
         ]
 
 
@@ -97,7 +98,6 @@
         ]
     </tie-vars>
     <div id="dataTag" style="display: none;"></div>
-    <!--tieVarsInterface('.varme>div', [['data-value', '--size'],['data-color', '--color']]);-->
     <div draggable="true" class="prepost" data-truecolor="grey">
         pre
     </div>
@@ -168,6 +168,12 @@
             <option value="orange">orange</option>
         </select>
         <div>hi</div>
+    </div>
+    <div id="testsource" data-hover="hello">
+        more data
+    </div>
+    <div id="testdestination">
+
     </div>
 </body>
 
